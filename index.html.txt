@@ -1,0 +1,338 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小红书教育培训笔记违禁词检测</title>
+    <style>
+        :root {
+            --primary-color: #ff2442; /* 小红书品牌色 */
+            --secondary-color: #f8f8f8;
+            --text-color: #333;
+            --light-text: #666;
+            --border-color: #e0e0e0;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --danger-color: #f44336;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 20px;
+        }
+        
+        .input-section {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+            margin-bottom: 10px;
+            transition: border 0.3s;
+        }
+        
+        input[type="text"]:focus, textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+        
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        button:hover {
+            background-color: #e61e3c;
+        }
+        
+        .result-section {
+            margin-top: 30px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }
+        
+        .result-box {
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+            background-color: var(--secondary-color);
+        }
+        
+        .success {
+            border-left: 4px solid var(--success-color);
+        }
+        
+        .warning {
+            border-left: 4px solid var(--warning-color);
+        }
+        
+        .danger {
+            border-left: 4px solid var(--danger-color);
+        }
+        
+        .result-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .issues-list {
+            margin-left: 20px;
+        }
+        
+        .issue-category {
+            font-weight: bold;
+            margin: 10px 0 5px 0;
+        }
+        
+        .issue-words {
+            color: var(--danger-color);
+            margin-left: 10px;
+        }
+        
+        .suggestions {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: rgba(255, 152, 0, 0.1);
+            border-radius: 4px;
+        }
+        
+        .suggestion-item {
+            margin-bottom: 5px;
+        }
+        
+        .media-warning {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: rgba(244, 67, 54, 0.1);
+            border-radius: 4px;
+            color: var(--danger-color);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 15px;
+            font-size: 12px;
+            color: var(--light-text);
+            border-top: 1px solid var(--border-color);
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+            }
+            
+            body {
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>小红书教育培训笔记违禁词检测</h1>
+            <div class="subtitle">发布前检测，避免违规限流</div>
+        </header>
+        
+        <div class="content">
+            <div class="input-section">
+                <label for="note-title">笔记标题</label>
+                <input type="text" id="note-title" placeholder="输入您的笔记标题...">
+                
+                <label for="note-content">笔记内容</label>
+                <textarea id="note-content" placeholder="输入您的笔记正文内容..."></textarea>
+                
+                <button id="check-btn">检测违禁词</button>
+            </div>
+            
+            <div class="result-section">
+                <h2>检测结果</h2>
+                <div id="result-container" class="result-box">
+                    <div id="default-result">请输入笔记标题和内容后点击"检测违禁词"按钮</div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>注意：本工具仅供参考，实际审核以小红书平台规则为准</p>
+            <p>建议发布前人工复核最新社区规范</p>
+        </footer>
+    </div>
+
+    <script>
+        class XiaohongshuEduValidator {
+            constructor() {
+                this.forbiddenWords = {
+                    "敏感类": ["最", "第一", "顶级", "国家级", "史上", "永久", "万能", "根治"],
+                    "承诺类": ["保过", "保分", "必过", "一次通过", "不二之选", "不过退款", "提分神器", "秒杀"],
+                    "K12类": ["幼升小", "小升初", "中考", "高考", "升学", "状元", "排名", "竞赛", "择校", "内部渠道"],
+                    "资质类": ["官方", "权威", "指定", "独家", "唯一", "领袖", "领先"],
+                    "引流类": ["微信", "vx", "加我", "私聊", "电话", "手机", "地址", "二维码", "QQ", "领取资料", "免费试听"],
+                    "平台类": ["学而思", "新东方", "作业帮", "猿辅导"],
+                    "政策类": ["双减", "双减政策", "教育内卷", "在职教师"]
+                };
+                
+                this.mediaWarning = "特别注意：笔记图片/视频中避免出现清晰、未经授权的未成年人正脸，尤其是用于课程宣传。";
+            }
+            
+            cleanText(text) {
+                if (!text) return "";
+                text = text.toLowerCase();
+                text = text.replace(/[^\w\u4e00-\u9fa5]+/g, '');
+                return text;
+            }
+            
+            checkText(title, content) {
+                const fullText = this.cleanText(title + content);
+                const foundIssues = {};
+                
+                for (const [category, words] of Object.entries(this.forbiddenWords)) {
+                    const foundWords = [];
+                    for (const word of words) {
+                        const cleanedWord = this.cleanText(word);
+                        if (cleanedWord && fullText.includes(cleanedWord)) {
+                            foundWords.push(word);
+                        }
+                    }
+                    if (foundWords.length > 0) {
+                        foundIssues[category] = foundWords;
+                    }
+                }
+                
+                return foundIssues;
+            }
+            
+            generateSuggestion(issues) {
+                if (Object.keys(issues).length === 0) {
+                    return {
+                        status: 'success',
+                        message: '✅ 初步检测通过，但请注意图片规范和整体语气。发布前请再次人工核对平台最新规则。',
+                        issues: null,
+                        suggestions: null
+                    };
+                }
+                
+                const suggestionLines = [
+                    "1. 用描述性语言替代绝对化词汇，如将'最专业'改为'经验丰富'",
+                    "2. 避免具体承诺，改为分享'学习方法'或'成长心得'",
+                    "3. 严禁任何形式的直接联系方式或引流暗示",
+                    "4. K12相关内容尤其谨慎，避免提及升学、分数、竞赛等敏感点"
+                ];
+                
+                return {
+                    status: 'danger',
+                    message: '⚠️ 检测到以下可能违规的词汇或类型',
+                    issues: issues,
+                    suggestions: suggestionLines,
+                    mediaWarning: this.mediaWarning
+                };
+            }
+        }
+        
+        document.getElementById('check-btn').addEventListener('click', function() {
+            const title = document.getElementById('note-title').value;
+            const content = document.getElementById('note-content').value;
+            
+            const validator = new XiaohongshuEduValidator();
+            const issues = validator.checkText(title, content);
+            const result = validator.generateSuggestion(issues);
+            
+            const resultContainer = document.getElementById('result-container');
+            resultContainer.innerHTML = '';
+            resultContainer.className = 'result-box';
+            
+            if (result.status === 'success') {
+                resultContainer.classList.add('success');
+                resultContainer.innerHTML = `
+                    <div class="result-title">${result.message}</div>
+                `;
+            } else {
+                resultContainer.classList.add('danger');
+                let issuesHTML = '<div class="result-title">' + result.message + '</div><div class="issues-list">';
+                
+                for (const [category, words] of Object.entries(result.issues)) {
+                    issuesHTML += `
+                        <div class="issue-category">${category}: <span class="issue-words">${words.join(', ')}</span></div>
+                    `;
+                }
+                
+                issuesHTML += '</div>';
+                
+                let suggestionsHTML = '<div class="suggestions"><strong>📝 修改建议：</strong>';
+                for (const suggestion of result.suggestions) {
+                    suggestionsHTML += `<div class="suggestion-item">${suggestion}</div>`;
+                }
+                suggestionsHTML += '</div>';
+                
+                const warningHTML = `<div class="media-warning">${result.mediaWarning}</div>`;
+                
+                resultContainer.innerHTML = issuesHTML + suggestionsHTML + warningHTML;
+            }
+        });
+    </script>
+</body>
+</html>
